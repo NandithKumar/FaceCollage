@@ -1,68 +1,232 @@
-FACE COLLAGE - ANDROID INTERNSHIP ASSIGNMENT
+# 📱 FaceCollage
 
+### On-device face detection, identification, and clustering for Android
 
+FaceCollage is a fully **on-device Android application** that analyzes a portrait video, detects faces, identifies appearances belonging to the same person, and generates a shareable **cast collage**.
 
-A fully on device Android app that takes a portrait video, detects every face, figures out which appearances belong to the same person, and builds a shareable cast of the video collage, one tile per distinct person, with their appearance count.
+Each distinct person gets one tile in the collage along with their appearance count.
 
+🔒 **No network calls. No backend. No cloud processing.**
 
+Everything runs directly on the Android device, including:
 
-No network calls, no backend. Everything (frame sampling, face detection, face embeddings, clustering, collage rendering) runs on device.
+* 🎞️ Frame sampling
+* 👤 Face detection
+* 🧠 Face embedding generation
+* 🔗 Identity clustering
+* 🖼️ Collage rendering
 
+---
 
+# 🚀 How It Works
 
-BUILD AND SETUP
+The processing pipeline is:
 
+```text
+Portrait Video
+      ↓
+Frame Sampling
+      ↓
+ML Kit Face Detection
+      ↓
+Face Quality Filtering
+      ↓
+FaceNet Embeddings (TensorFlow Lite)
+      ↓
+Agglomerative Clustering
+      ↓
+Distinct People
+      ↓
+Collage Generation
+```
 
+The app processes frames from the selected video and detects faces using **Google ML Kit**.
 
-Step 1: Clone the repo using: git clone https://github.com/NandithKumar/FaceCollage.git
+Each detected face is converted into a numerical representation called a **face embedding** using a quantized **FaceNet TensorFlow Lite model**.
 
-Step 2: Open the project in Android Studio (Giraffe or newer recommended).
+These embeddings are then compared and grouped using **agglomerative clustering** to determine which appearances belong to the same person.
 
-Step 3: Let Gradle sync (first sync may take a few minutes, it downloads dependencies).
+Finally, the app generates a collage containing one tile for each distinct person.
 
-Step 4: Connect an Android device (API 26 or higher recommended) with USB debugging enabled, or use an emulator.
+---
 
-Step 5: Run gradlew installDebug from the terminal, or click the Run button in Android Studio with your device selected.
+# 🛠️ Technologies Used
 
-Step 6: On first launch, pick a video from your device to process.
+* **Kotlin**
+* **Android SDK**
+* **Google ML Kit Face Detection**
+* **TensorFlow Lite**
+* **FaceNet**
+* **Computer Vision**
+* **Agglomerative Clustering**
+* **On-device Machine Learning**
 
+---
 
+# 📦 Build and Setup
 
-EMBEDDING MODEL
+### 1️⃣ Clone the repository
 
+```bash
+git clone https://github.com/NandithKumar/FaceCollage.git
+```
 
+### 2️⃣ Open the project
 
-Model: FaceNet (Inception-ResNet-v1), trained with triplet loss on VGGFace2 and MS1M.
+Open the project using **Android Studio Giraffe or newer**.
 
-Format: Converted to TFLite, int8 quantized weights, float32 input and output.
+### 3️⃣ Sync Gradle
 
-Input: 160x160x3 RGB face crop, using per-image prewhiten standardization.
+Allow Gradle to sync and download the required dependencies.
 
-Output: 128 dimensional embedding vector, L2-normalized so cosine similarity equals dot product.
+> The first sync may take a few minutes.
 
-The model file is bundled at app/src/main/assets/facenet.tflite.
+### 4️⃣ Connect a device or emulator
 
+Use:
 
+* An Android device with **USB debugging enabled**, or
+* An Android emulator
 
-CLUSTERING AND SIMILARITY THRESHOLD
+**API 26 or higher is recommended.**
 
+### 5️⃣ Run the application
 
+You can either:
 
-Method: Average-linkage agglomerative clustering. Starts with one cluster per face appearance, repeatedly merges the two clusters whose centroids are most similar by cosine similarity, and stops when the best remaining pair falls below the threshold.
+* Click the ▶️ **Run** button in Android Studio, or
+* Run the following command:
 
-Threshold: 0.62, chosen empirically. Same-person appearances in a clip typically score above roughly 0.70 cosine similarity, while different people typically score below roughly 0.50. 0.62 sits in that gap with margin on both sides.
+```bash
+./gradlew installDebug
+```
 
-To retune for different footage, adjust the similarityThreshold value in IdentityClusterer.kt.
+### 6️⃣ Select a video
 
+When the application launches, select a portrait video from your device to begin processing.
 
+---
 
-KNOWN ISSUES AND TRADEOFFS
+# 🧠 Face Embedding Model
 
+### Model
 
+**FaceNet (Inception-ResNet-v1)**
 
-The threshold of 0.62 was tuned on the provided sample videos, so very different lighting or camera angle conditions may need retuning.
+The model generates a numerical embedding representing the identity-related features of a detected face.
 
-There is no manual re-labeling of misclassified people yet.
+### Model Details
 
-Processing time scales with video length and the number of faces detected.
+* **Training:** Triplet loss using VGGFace2 and MS1M datasets
+* **Format:** TensorFlow Lite
+* **Quantization:** INT8 weights
+* **Input:** Float32
+* **Output:** Float32
+* **Input Size:** `160 × 160 × 3` RGB face crop
+* **Embedding Size:** `128-dimensional vector`
+* **Preprocessing:** Per-image prewhiten standardization
+* **Normalization:** L2 normalization
 
+After normalization, cosine similarity can be calculated efficiently using the dot product of embedding vectors.
+
+### Model Location
+
+```text
+app/src/main/assets/facenet.tflite
+```
+
+---
+
+# 🔗 Face Clustering
+
+The application uses **average-linkage agglomerative clustering** to group different appearances belonging to the same person.
+
+### How it works
+
+1. Each face appearance initially starts as its own cluster.
+2. The algorithm compares clusters using cosine similarity.
+3. The two most similar clusters are repeatedly merged.
+4. Clustering stops when the best remaining similarity falls below the configured threshold.
+
+---
+
+# 🎯 Similarity Threshold
+
+The current similarity threshold is:
+
+```text
+0.62
+```
+
+This value was chosen empirically using the provided sample videos.
+
+Typical observations:
+
+| Face Comparison   | Typical Cosine Similarity |
+| ----------------- | ------------------------: |
+| Same person       |               Above ~0.70 |
+| Different people  |               Below ~0.50 |
+| Current threshold |                  **0.62** |
+
+The threshold can be adjusted for different types of footage.
+
+To retune it, modify:
+
+```text
+similarityThreshold
+```
+
+inside:
+
+```text
+IdentityClusterer.kt
+```
+
+---
+
+# ⚡ Key Challenge: Appearance Segmentation
+
+One of the most challenging parts of the project was handling different appearances of the same person.
+
+Video frames can contain:
+
+* Motion blur
+* Rapid camera movement
+* Whip-pans
+* Different face angles
+* Temporary occlusions
+
+Poor-quality frames can cause the same person to appear as multiple identities.
+
+The pipeline therefore filters unsuitable appearances before clustering, helping reduce incorrect identity splitting.
+
+---
+
+# ⚠️ Known Issues and Trade-offs
+
+* The `0.62` similarity threshold was tuned using the provided sample videos and may require adjustment for significantly different lighting or camera angles.
+* Manual correction or relabeling of incorrectly clustered people is not currently available.
+* Processing time increases with video length and the number of detected faces.
+
+---
+
+# 🔒 Privacy
+
+FaceCollage is designed to run entirely **on-device**.
+
+* ❌ No cloud processing
+* ❌ No backend
+* ❌ No network calls required
+* ✅ Video processing stays on the user's device
+
+---
+
+# 👨‍💻 Author
+
+**Nandith Kumar**
+
+🔗 GitHub: https://github.com/NandithKumar
+
+---
+
+⭐ If you found this project interesting, consider giving the repository a star!
