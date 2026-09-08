@@ -1,22 +1,27 @@
-# 📱 FaceCollage
+An on-device Android application that analyzes a portrait video, detects faces, groups appearances belonging to the same person, and generates a shareable Face Collage with appearance counts.
 
-### On-device face detection, identification, and clustering for Android
+📱 Overview
 
-FaceCollage is a fully **on-device Android application** that analyzes a portrait video, detects faces, identifies appearances belonging to the same person, and generates a shareable **cast collage**.
+Face Collage is a fully on-device Android application designed to analyze people appearing in a portrait video.
 
-Each distinct person gets one tile in the collage along with their appearance count.
+The app processes video frames, detects faces, generates facial embeddings, groups similar faces together, and creates a visual collage representing the distinct people appearing throughout the video.
 
-🔒 **No network calls. No backend. No cloud processing.**
+Each person gets their own tile in the final collage along with their appearance count.
 
-Everything runs directly on the Android device, including:
+🔒 No backend. No cloud processing. No network calls.
 
-* 🎞️ Frame sampling
-* 👤 Face detection
-* 🧠 Face embedding generation
-* 🔗 Identity clustering
-* 🖼️ Collage rendering
+Everything happens directly on the Android device.
 
----
+✨ Features
+🎥 Process portrait videos directly on Android
+👤 Detect multiple faces across video frames
+🧠 Generate face embeddings for detected faces
+🔗 Group appearances belonging to the same person
+🔢 Count how many times each person appears
+🖼️ Generate a Face Collage automatically
+📤 Create a shareable final result
+📱 Fully on-device processing
+🔒 No backend or cloud processing required
 
 # 🚀 How It Works
 
@@ -39,16 +44,44 @@ Distinct People
       ↓
 Collage Generation
 ```
+Step 1: Video Frame Sampling
 
-The app processes frames from the selected video and detects faces using **Google ML Kit**.
+The application extracts frames from the selected portrait video at intervals suitable for processing.
 
-Each detected face is converted into a numerical representation called a **face embedding** using a quantized **FaceNet TensorFlow Lite model**.
+🔹 Step 2: Face Detection
 
-These embeddings are then compared and grouped using **agglomerative clustering** to determine which appearances belong to the same person.
+Each sampled frame is analyzed to identify the faces present in the video.
 
-Finally, the app generates a collage containing one tile for each distinct person.
+🔹 Step 3: Face Embeddings
 
+For every detected face, the application generates a numerical representation called a face embedding.
+
+🔹 Step 4: Face Clustering
+
+Similar embeddings are compared and grouped together to identify appearances belonging to the same person.
+
+🔹 Step 5: Appearance Counting
+
+The application tracks appearances for each identified person.
+
+🔹 Step 6: Collage Generation
+
+The final result is rendered as a visual collage containing:
+
+👤 One tile per distinct person
+🔢 Appearance count
+🖼️ Representative face image
 ---
+📸 Results
+
+The application generates a visual cast of the people detected throughout the video.
+
+Example Output 1
+<img width="1536" height="1519" alt="image" src="https://github.com/user-attachments/assets/239a201d-1552-416c-86e0-170c5b8d23e2" />
+
+Example Output 2
+
+<img width="688" height="1536" alt="image" src="https://github.com/user-attachments/assets/c28d1b77-8e11-45a7-bc06-a11ba0657f8d" />
 
 # 🛠️ Technologies Used
 
